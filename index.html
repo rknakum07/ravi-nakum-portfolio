@@ -2749,11 +2749,17 @@
       }
 
       .wcard-in {
-        grid-template-columns: minmax(0, 1fr);
+        display: flex;
+        flex-direction: column;
         min-height: 0
       }
 
+      .wcard-body {
+        order: 1
+      }
+
       .wcard-media {
+        order: -1;
         display: block;
         width: 100%;
         aspect-ratio: 16 / 10;
@@ -2947,6 +2953,19 @@
     }
 
     @media (max-width:63.9375rem) {
+      .hx-grid {
+        display: flex;
+        flex-direction: column
+      }
+
+      .hx-visual {
+        order: -1
+      }
+
+      .hx-copy {
+        order: 1
+      }
+
       .hx {
         padding-top: 5.5rem
       }
