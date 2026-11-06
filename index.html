@@ -2803,13 +2803,14 @@
     .hx-copy {
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
-      padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 4vw, 4rem) clamp(1.5rem, 3vw, 2.5rem) var(--gi)
+      padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 4vw, 4rem);
+      text-align: center
     }
 
     .hx-copy h1 {
-      margin: 0;
+      margin: 0 auto;
       max-width: 13ch;
       font-size: clamp(2.25rem, 4vw, 3.5rem);
       font-weight: 700;
@@ -2820,7 +2821,7 @@
     }
 
     .hx-copy p {
-      margin: clamp(1rem, 2vw, 1.5rem) 0 0;
+      margin: clamp(1rem, 2vw, 1.5rem) auto 0;
       max-width: 32rem;
       font-size: clamp(1rem, 1.3vw, 1.125rem);
       line-height: 1.6;
@@ -2830,10 +2831,17 @@
 
     .hx-copy .cta {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       align-items: center;
+      justify-content: center;
       gap: 0.875rem;
+      width: 100%;
       margin-top: clamp(1.5rem, 3vw, 2.25rem)
+    }
+
+    .hx-copy .cta .btn {
+      flex: 0 1 auto;
+      white-space: nowrap
     }
 
     .hx-copy .cta .btn:nth-child(2)::after {
@@ -2842,12 +2850,23 @@
 
     @media (max-width: 30rem) {
       .hx-copy .cta {
-        width: 100%
+        gap: 0.5rem
       }
 
       .hx-copy .cta .btn {
-        width: 100%;
-        justify-content: space-between
+        flex: 1 1 0;
+        min-width: 0;
+        height: 3rem;
+        gap: 0.25rem;
+        padding: 0 0.25rem 0 0.55rem;
+        justify-content: space-between;
+        font-size: clamp(0.625rem, 2.5vw, 0.8125rem)
+      }
+
+      .hx-copy .cta .btn .arr {
+        flex: 0 0 2rem;
+        width: 2rem;
+        height: 2rem
       }
     }
 
