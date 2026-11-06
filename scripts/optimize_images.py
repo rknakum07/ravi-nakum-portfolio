@@ -115,5 +115,17 @@ for name, stem in (("img/Before.png", "before"), ("img/After.png", "after")):
 
 # CTA background is deliberately left byte-for-byte unchanged: it is already small,
 # and preserving its original alpha/background avoids black matte artifacts.
+# Create a clean, lossless CTA derivative without compositing or adding a background.
+cta_source = IMG / "cta-phone-bg.webp"
+if cta_source.exists():
+    cta_image = open_preserving_alpha(cta_source)
+    cta_target = IMG / "cta-phone-bg-clean.webp"
+    save_kwargs = {"format": "WEBP", "lossless": True, "method": 6, "exact": True}
+    icc_profile = Image.open(cta_source).info.get("icc_profile")
+    if icc_profile:
+        save_kwargs["icc_profile"] = icc_profile
+    cta_image.save(cta_target, **save_kwargs)
+
+html = html.replace("url('img/cta-phone-bg.webp')", "url('img/cta-phone-bg-clean.webp')")
 HTML.write_text(html, encoding="utf-8")
 print("Created high-quality responsive WebP variants; original assets and CTA background preserved.")
