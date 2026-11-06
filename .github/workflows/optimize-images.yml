@@ -1,6 +1,11 @@
 name: Optimize portfolio images
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/optimize_images.py'
+      - '.github/workflows/optimize-images.yml'
 permissions:
   contents: write
 jobs:
