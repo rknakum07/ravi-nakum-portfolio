@@ -28,14 +28,14 @@ for stem in ("Before", "After"):
 # Resize large project/service screenshots and create smaller responsive candidates.
 for pattern in ("selected_work*.webp", "service*.webp"):
     for source in IMG.glob(pattern):
-        if re.search(r"-\\d+\\.webp$", source.name):
+        if re.search(r"-\d+\.webp$", source.name):
             continue
         webp(source, source.with_name(source.stem + "-640.webp"), 640, 74)
         webp(source, source, 1200, 78)
 
 # Testimonial screenshots are displayed smaller than full-width project previews.
 for source in IMG.glob("testimonial_*.webp"):
-    if re.search(r"-\\d+\\.webp$", source.name):
+    if re.search(r"-\d+\.webp$", source.name):
         continue
     webp(source, source.with_name(source.stem + "-600.webp"), 600, 74)
     webp(source, source, 1000, 76)
