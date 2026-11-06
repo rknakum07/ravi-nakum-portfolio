@@ -2754,7 +2754,14 @@
       }
 
       .wcard-media {
-        display: none
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        margin-top: 0.25rem
+      }
+
+      .wcard-media img {
+        object-fit: cover
       }
     }
 
