@@ -4323,6 +4323,8 @@
     (function () {
       if (!window.gsap || !window.ScrollTrigger) return;
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      /* On small screens, keep content visible immediately and avoid the large set of decorative scroll/hover tweens. */
+      if (window.matchMedia('(max-width: 767px)').matches) return;
       gsap.registerPlugin(ScrollTrigger);
       var ease = 'power3.out';
 
