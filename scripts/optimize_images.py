@@ -77,7 +77,7 @@ def set_responsive_image(html_text, source, candidates, sizes):
     fallback = candidates[len(candidates)//2][0]
     def repl(m):
         tag = m.group(0)
-        tag = re.sub(r'\bsrc=(["\'])' + re.escape(source) + r'\1', f'src="{fallback}"', tag, count=1)
+        tag = re.sub(r'\bsrc=(["\'])' + re.escape(source) + r'\1', f'src="img/{fallback}"', tag, count=1)
         tag = re.sub(r'\s+srcset=(["\']).*?\1', '', tag, count=1)
         tag = re.sub(r'\s+sizes=(["\']).*?\1', '', tag, count=1)
         return tag[:-1] + f' srcset="{srcset}" sizes="{sizes}">'
