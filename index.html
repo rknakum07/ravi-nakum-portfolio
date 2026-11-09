@@ -4407,14 +4407,23 @@
       form.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        var f = form.elements;
-        var nOk = f.name.value.trim().length > 1;
-        var eOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.value.trim());
-        var mOk = f.message.value.trim().length > 4;
+        /* Read fields by ID to avoid named-property collisions in form.elements. */
+        var nameInput = document.getElementById('cf-name');
+        var emailInput = document.getElementById('cf-email');
+        var serviceInput = document.getElementById('cf-service');
+        var messageInput = document.getElementById('cf-msg');
 
-        mark(f.name, !nOk);
-        mark(f.email, !eOk);
-        mark(f.message, !mOk);
+        var nameValue = nameInput.value.trim();
+        var emailValue = emailInput.value.trim();
+        var messageValue = messageInput.value.trim();
+
+        var nOk = nameValue.length > 1;
+        var eOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
+        var mOk = messageValue.length > 4;
+
+        mark(nameInput, !nOk);
+        mark(emailInput, !eOk);
+        mark(messageInput, !mOk);
 
         if (!(nOk && eOk && mOk)) {
           status.textContent = 'Please fix the highlighted fields.';
@@ -4424,11 +4433,11 @@
 
         var submitButton = form.querySelector('button[type="submit"]');
         var data = {
-          name: f.name.value.trim(),
-          email: f.email.value.trim(),
-          service: f.service.value || 'Not specified',
-          message: f.message.value.trim(),
-          _subject: 'New portfolio enquiry from ' + f.name.value.trim(),
+          name: nameValue,
+          email: emailValue,
+          service: serviceInput.value || 'Not specified',
+          message: messageValue,
+          _subject: 'New portfolio enquiry from ' + nameValue,
           _template: 'table'
         };
 
