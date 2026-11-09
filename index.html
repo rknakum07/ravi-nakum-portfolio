@@ -4085,6 +4085,8 @@
             </ul>
           </div>
           <form class="contact-form" id="contactForm" novalidate>
+            <input type="hidden" name="_subject" value="New portfolio enquiry">
+            <input type="hidden" name="_template" value="table">
             <div class="field-row">
               <div class="field"><label for="cf-name">Name</label><input id="cf-name" name="name" type="text"
                   autocomplete="name" placeholder="Your name" aria-describedby="err-name"><span class="err-msg"
@@ -4271,31 +4273,79 @@
 
     /* CONTACT FORM */
     (function () {
-      /* Set ONE of these when you host the page: a form-service URL (Formspree, Netlify, your own API) or your email address. */
-      var form = document.getElementById('contactForm'), status = document.getElementById('formStatus');
-      function mark(input, bad) { input.closest('.field').classList.toggle('err', bad); input.setAttribute('aria-invalid', bad ? 'true' : 'false') }
+      var form = document.getElementById('contactForm');
+      var status = document.getElementById('formStatus');
+      if (!form || !status) return;
+
+      function mark(input, bad) {
+        input.closest('.field').classList.toggle('err', bad);
+        input.setAttribute('aria-invalid', bad ? 'true' : 'false');
+      }
+
       form.addEventListener('submit', function (e) {
         e.preventDefault();
-        var FORM_ENDPOINT = '', CONTACT_EMAIL = 'vrteam.designs@gmail.com';
-        var f = form.elements, bad = false;
-        var nOk = f.name.value.trim().length > 1, eOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.value.trim()), mOk = f.message.value.trim().length > 4;
-        mark(f.name, !nOk); mark(f.email, !eOk); mark(f.message, !mOk);
-        if (!(nOk && eOk && mOk)) { status.textContent = 'Please fix the highlighted fields.'; return }
-        var data = { name: f.name.value.trim(), email: f.email.value.trim(), service: f.service.value, message: f.message.value.trim() };
-        if (FORM_ENDPOINT) {
-          status.textContent = 'Sending…';
-          fetch(FORM_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(data) })
-            .then(function (r) { if (!r.ok) throw new Error('bad'); form.reset(); status.textContent = 'Thanks! Your message has been sent.' })
-            .catch(function () { status.textContent = 'Something went wrong. Please try again or email me directly.' });
-        } else if (CONTACT_EMAIL) {
-          var body = 'Name: ' + data.name + '\nEmail: ' + data.email + '\nService: ' + (data.service || '-') + '\n\n' + data.message;
-          window.location.href = 'mailto:' + CONTACT_EMAIL + '?subject=' + encodeURIComponent('Project enquiry from ' + data.name) + '&body=' + encodeURIComponent(body);
-          status.textContent = 'Opening your email app…';
-        } else {
-          status.textContent = 'Form not connected yet: add FORM_ENDPOINT or CONTACT_EMAIL in the code.';
+
+        var f = form.elements;
+        var nOk = f.name.value.trim().length > 1;
+        var eOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.value.trim());
+        var mOk = f.message.value.trim().length > 4;
+
+        mark(f.name, !nOk);
+        mark(f.email, !eOk);
+        mark(f.message, !mOk);
+
+        if (!(nOk && eOk && mOk)) {
+          status.textContent = 'Please fix the highlighted fields.';
+          return;
         }
+
+        var submitButton = form.querySelector('button[type="submit"]');
+        var data = {
+          name: f.name.value.trim(),
+          email: f.email.value.trim(),
+          service: f.service.value || 'Not specified',
+          message: f.message.value.trim(),
+          _subject: 'New portfolio enquiry from ' + f.name.value.trim(),
+          _template: 'table'
+        };
+
+        submitButton.disabled = true;
+        status.textContent = 'Sending your message…';
+
+        fetch('https://formsubmit.co/ajax/vrteam.designs@gmail.com', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+          .then(function (response) {
+            if (!response.ok) throw new Error('Submission failed');
+            return response.json();
+          })
+          .then(function (result) {
+            if (result.success !== 'true' && result.success !== true) {
+              throw new Error(result.message || 'Submission was not accepted');
+            }
+            form.reset();
+            form.querySelectorAll('[aria-invalid="true"]').forEach(function (input) {
+              input.removeAttribute('aria-invalid');
+            });
+            status.textContent = 'Thanks! Your message has been sent successfully.';
+          })
+          .catch(function () {
+            status.textContent = 'Sorry, your message could not be sent. Please try again or email vrteam.designs@gmail.com directly.';
+          })
+          .finally(function () {
+            submitButton.disabled = false;
+          });
       });
-      form.addEventListener('input', function (e) { var fl = e.target.closest('.field'); if (fl) fl.classList.remove('err') });
+
+      form.addEventListener('input', function (e) {
+        var field = e.target.closest('.field');
+        if (field) field.classList.remove('err');
+      });
     })();
 
     /* MY SERVICES: draggable wheel */
