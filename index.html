@@ -4409,7 +4409,7 @@
 
         var f = form.elements;
         var nOk = f.name.value.trim().length > 1;
-        var eOk = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(f.email.value.trim());
+        var eOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.value.trim());
         var mOk = f.message.value.trim().length > 4;
 
         mark(f.name, !nOk);
