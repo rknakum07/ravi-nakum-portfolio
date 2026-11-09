@@ -4419,15 +4419,14 @@
 
         var nOk = nameValue.length > 1;
         var eOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
-        var mOk = messageValue.length > 4;
-
+        /* Project details are optional; only name and email are required. */
         mark(nameInput, !nOk);
         mark(emailInput, !eOk);
-        mark(messageInput, !mOk);
+        mark(messageInput, false);
 
-        if (!(nOk && eOk && mOk)) {
+        if (!(nOk && eOk)) {
           status.textContent = 'Please fix the highlighted fields.';
-          showResult('error', 'Please check your details', 'Enter your name, a valid email address and a few project details before submitting.');
+          showResult('error', 'Please check your details', 'Enter your name and a valid email address before submitting.');
           return;
         }
 
