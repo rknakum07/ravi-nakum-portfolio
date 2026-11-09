@@ -1507,6 +1507,89 @@
       color: var(--color-muted)
     }
 
+    .form-result-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: grid;
+      place-items: center;
+      padding: 1.25rem;
+      background: rgba(15, 18, 25, .58);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .2s ease, visibility .2s ease
+    }
+
+    .form-result-modal.is-open {
+      opacity: 1;
+      visibility: visible
+    }
+
+    .form-result-card {
+      position: relative;
+      width: min(100%, 26rem);
+      padding: 2rem 1.5rem 1.5rem;
+      border: 1px solid var(--color-border);
+      border-radius: 1.5rem;
+      background: var(--color-bg);
+      color: var(--color-text);
+      text-align: center;
+      box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, .2);
+      transform: translateY(0.75rem);
+      transition: transform .2s ease
+    }
+
+    .form-result-modal.is-open .form-result-card {
+      transform: translateY(0)
+    }
+
+    .form-result-icon {
+      display: grid;
+      place-items: center;
+      width: 3.5rem;
+      height: 3.5rem;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+      background: var(--color-soft);
+      color: var(--color-heading);
+      font-size: 1.75rem;
+      font-weight: 700
+    }
+
+    .form-result-card[data-state="success"] .form-result-icon {
+      background: rgba(35, 160, 105, .12);
+      color: #168653
+    }
+
+    .form-result-card[data-state="error"] .form-result-icon {
+      background: rgba(210, 55, 55, .1);
+      color: #c93636
+    }
+
+    .form-result-card h3 {
+      margin: 0 0 .5rem;
+      font-size: 1.5rem
+    }
+
+    .form-result-card p {
+      margin: 0 auto 1.5rem;
+      max-width: 22rem;
+      color: var(--color-muted);
+      line-height: 1.55
+    }
+
+    .form-result-card .btn {
+      justify-content: center;
+      min-width: 8rem
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .form-result-modal,
+      .form-result-card {
+        transition: none
+      }
+    }
+
     /* HERO INFINITE GRID */
     .hero {
       position: relative;
@@ -4123,6 +4206,15 @@
         </div>
       </div>
     </section>
+
+    <div class="form-result-modal" id="formResultModal" aria-hidden="true">
+      <div class="form-result-card" id="formResultCard" data-state="success" role="dialog" aria-modal="true" aria-labelledby="formResultTitle" aria-describedby="formResultMessage">
+        <div class="form-result-icon" id="formResultIcon" aria-hidden="true">✓</div>
+        <h3 id="formResultTitle">Message sent</h3>
+        <p id="formResultMessage">Thanks for reaching out. I'll get back to you soon.</p>
+        <button class="btn" type="button" id="formResultClose">Close</button>
+      </div>
+    </div>
   </main>
 
   <footer class="footer">
@@ -4276,19 +4368,48 @@
     (function () {
       var form = document.getElementById('contactForm');
       var status = document.getElementById('formStatus');
-      if (!form || !status) return;
+      var modal = document.getElementById('formResultModal');
+      var card = document.getElementById('formResultCard');
+      var title = document.getElementById('formResultTitle');
+      var message = document.getElementById('formResultMessage');
+      var icon = document.getElementById('formResultIcon');
+      var closeButton = document.getElementById('formResultClose');
+      if (!form || !status || !modal || !card || !closeButton) return;
 
       function mark(input, bad) {
         input.closest('.field').classList.toggle('err', bad);
         input.setAttribute('aria-invalid', bad ? 'true' : 'false');
       }
 
+      function showResult(state, heading, copy) {
+        card.setAttribute('data-state', state);
+        title.textContent = heading;
+        message.textContent = copy;
+        icon.textContent = state === 'success' ? '✓' : '!';
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        closeButton.focus();
+      }
+
+      function closeResult() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+
+      closeButton.addEventListener('click', closeResult);
+      modal.addEventListener('click', function (event) {
+        if (event.target === modal) closeResult();
+      });
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && modal.classList.contains('is-open')) closeResult();
+      });
+
       form.addEventListener('submit', function (e) {
         e.preventDefault();
 
         var f = form.elements;
         var nOk = f.name.value.trim().length > 1;
-        var eOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.value.trim());
+        var eOk = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(f.email.value.trim());
         var mOk = f.message.value.trim().length > 4;
 
         mark(f.name, !nOk);
@@ -4297,6 +4418,7 @@
 
         if (!(nOk && eOk && mOk)) {
           status.textContent = 'Please fix the highlighted fields.';
+          showResult('error', 'Please check your details', 'Enter your name, a valid email address and a few project details before submitting.');
           return;
         }
 
@@ -4333,10 +4455,12 @@
             form.querySelectorAll('[aria-invalid="true"]').forEach(function (input) {
               input.removeAttribute('aria-invalid');
             });
-            status.textContent = 'Thanks! Your message has been sent successfully.';
+            status.textContent = 'Your message has been sent.';
+            showResult('success', 'Message sent successfully!', 'Thanks for reaching out. Your enquiry has been submitted. I’ll get back to you soon.');
           })
           .catch(function () {
-            status.textContent = 'Sorry, your message could not be sent. Please try again or email vrteam.designs@gmail.com directly.';
+            status.textContent = 'Your message could not be sent.';
+            showResult('error', 'Message not sent', 'Something went wrong while sending your enquiry. Please try again or email vrteam.designs@gmail.com directly.');
           })
           .finally(function () {
             submitButton.disabled = false;
